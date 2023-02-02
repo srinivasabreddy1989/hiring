@@ -5,7 +5,7 @@ pipeline {
         stage('Git checkout') {
             steps {
                 //checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'git-creds', url: 'https://github.com/srinivasabreddy1989/javahomehiring.git']])
-                git branch: 'main', credentialsId: 'git-creds', url: 'https://github.com/srinivasabreddy1989/hiring.git'
+                git branch: 'master', credentialsId: 'git-creds', url: 'https://github.com/srinivasabreddy1989/hiring.git'
             }
         }
         stage('Git package') {
