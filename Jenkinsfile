@@ -2,30 +2,24 @@ pipeline {
     agent any
 
     stages {
-        
-        stage('Maven Build') {
-            when {
-                branch 'develop'
-            }
+        stage('Git checkout') {
             steps {
-                sh "mvn clean package"
+                //checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'git-creds', url: 'https://github.com/srinivasabreddy1989/javahomehiring.git']])
+                git branch: 'main', credentialsId: 'git-creds', url: 'https://github.com/srinivasabreddy1989/javahomehiring.git'
             }
         }
-        
-        stage('Tomcat Deploy - Dev') {
-            when {
-                branch 'develop'
-            }
+        stage('Git package') {
             steps {
-                echo "Deploying to dev"
+                sh 'mvn clean package'
             }
         }
-        stage('Tomcat Deploy - Prod') {
-            when {
-                branch 'main'
-            }
+        stage('Apache deply') {
             steps {
-                echo "Deploying to production"
+               sshagent(['Tomcat-creds']) {
+                    sh "scp -o StrictHostKeyChecking=no target/*.war ec2-user@172.31.31.68:/opt/tomcat9/webapps/"
+                    sh "ssh ec2-user@172.31.31.68 /opt/tomcat9/bin/shutdown.sh"
+                    sh "ssh ec2-user@172.31.31.68 /opt/tomcat9/bin/startup.sh"
+                }
             }
         }
     }
